@@ -2,14 +2,25 @@
  // one method 
 
 import dotenv from "dotenv";
-
+import { app } from "./app.js";
 import connectDB from "./db/index.js";
 
 dotenv.config({
     path: "./.env"
 })
-connectDB()
-
+connectDB() //since this DB is connected in a async function, we need to handle the promise that is returned by the function by .then and .catch
+.then(()=> {
+    app.on("error", (error) => {
+        console.log("Error: ", error);
+        throw error
+    }) // checking for any errors that may occur during the connection of the server
+    app.listen(process.env.PORT || 8000, ()=>{
+        console.log(`Server is running on port ${process.env.PORT}`);
+    })
+})
+.catch((err) => {
+    console.log("MONGO Db connection is failed!! ", err);
+})
 
 
 //this is first approach to connect to the database
